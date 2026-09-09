@@ -27,6 +27,9 @@ def my_authorial_sort(arr: List[Any]) -> Tuple[List[Any], int, int]:
     """
     a = list(arr)
     n = len(a)
+    if n <= 1:
+        return a, 0, 0
+    
     comps = 0
     moves = 0
 
