@@ -1,21 +1,9 @@
-"""
-TEMPLATE PARA O ALUNO — TRABALHO PRÁTICO 1 (TP1)
-Disciplina: Análise e Projetos de Algoritmos (APA)
-
-Instruções:
-1. Implemente seu método de ordenação autoral na função `my_authorial_sort`.
-2. O retorno deve ser obrigatoriamente a tupla: (lista_ordenada, total_comparacoes, total_movimentacoes).
-3. Execute este arquivo diretamente para rodar a suíte de testes de corretude e o benchmark rápido.
-"""
-
 from typing import Any, List, Tuple
 import unittest
 from src.classical import bubble_sort, insertion_sort
 
 def my_authorial_sort(arr: List[Any]) -> Tuple[List[Any], int, int]:
     """
-    IMPLEMENTE AQUI SEU ALGORITMO AUTORAL.
-
     Parâmetros:
         arr (List[Any]): Lista de entrada a ser ordenada.
 
@@ -33,7 +21,7 @@ def my_authorial_sort(arr: List[Any]) -> Tuple[List[Any], int, int]:
     comps = 0
     moves = 0
 
-    p1, p2, comps_pivo, moves_pivo = encontrar_pivos(a)
+    p1, p2, comps_pivo, moves_pivo = encontrar_pivos(a, n)
     comps += comps_pivo
     moves += moves_pivo
 
@@ -46,50 +34,61 @@ def my_authorial_sort(arr: List[Any]) -> Tuple[List[Any], int, int]:
         comps += 1
 
         if a[i] < p1:
-            jogador_esquerda, comps_esquerda, moves_esquerda = inserir_ordenado(jogador_esquerda, a[i])
-            comps += comps_esquerda
-            moves += moves_esquerda
+            jogador_esquerda, c, m = inserir_ordenado(jogador_esquerda, a[i])
+            comps += c
+            moves += m
 
         elif a[i] > p2:
             comps += 1
-            jogador_direita, comps_direita, moves_direita = inserir_ordenado(jogador_direita, a[i])
-            comps += comps_direita
-            moves += moves_direita
+            jogador_direita, c, m = inserir_ordenado(jogador_direita, a[i])
+            comps += c
+            moves += m
 
         else:
-            jogador_meio, comps_meio, moves_meio = inserir_ordenado(jogador_meio, a[i])
-            comps += comps_meio
-            moves += moves_meio
+            jogador_meio, c, m = inserir_ordenado(jogador_meio, a[i])
+            comps += c
+            moves += m
 
     a, moves_final = recolher_cartas_ordenadas(jogador_esquerda, jogador_meio, jogador_direita)
     moves += moves_final
 
     return a, comps, moves
 
-def encontrar_pivos(arr: List[Any]) -> Tuple[int, int, int, int]:
+def encontrar_pivos(arr: List[Any], tamanho_vetor: int) -> Tuple[int, int, int, int]:
     """
-    Função auxiliar para encontrar pivôs amostrais.
+    Função auxiliar para encontrar pivôs amostrais 
+    em espaços distribuídos proporcionalmente pelo vetor.
     """
 
-    primeiro = arr[0]
-    meio = arr[len(arr) // 2]
-    ultimo = arr[len(arr) - 1]
+    tamanho_amostra = max(9, int(tamanho_vetor ** 0.5) + 1)
+    quantidade_elementos_amostra = min(tamanho_amostra, tamanho_vetor)
+ 
+    if quantidade_elementos_amostra <= 2:
+        return arr[0], arr[-1], 0, 0
+ 
+    indices = []
 
-    response = [primeiro, meio, ultimo]
+    for i in range(quantidade_elementos_amostra):
+        indice = round(
+            i * (tamanho_vetor - 1) / (quantidade_elementos_amostra - 1)
+        )
+        indices.append(indice)
+    indices = sorted(set(indices))
 
-    comparacoes = 0
-    movimentacoes = 0
+    amostra = [arr[i] for i in indices]
+    
 
-    response, comps_bubble, moves_bubble = bubble_sort(response)
-    comparacoes += comps_bubble
-    movimentacoes += moves_bubble
+    amostra_ordenada, comparacoes, movimentacoes = insertion_sort(amostra)
+    amostra_ordenada_tamanho = len(amostra_ordenada)
+    p1 = amostra_ordenada[amostra_ordenada_tamanho // 3]
+    p2 = amostra_ordenada[(2 * amostra_ordenada_tamanho) // 3]
 
-    return response[0], response[1], comparacoes, movimentacoes
+    return p1, p2, comparacoes, movimentacoes
 
 def inserir_ordenado(mao: List[Any], elemento: Any) -> Tuple[List[Any], int, int]:
     """
     Função auxiliar para o jogador inserir a carta ordenamente na mão.
-    Utiliza o algoritmo Insertion Sort para ordenar as cartas.
+    Verifica se a carta é menor que a última carta da mão e, caso seja, realiza a troca até que a carta esteja na posição correta.
     """
     comparacoes = 0
     movimentacoes = 0
@@ -98,10 +97,15 @@ def inserir_ordenado(mao: List[Any], elemento: Any) -> Tuple[List[Any], int, int
     mao.append(elemento)
     movimentacoes += 1
 
-    # aplica o Insertion Sort para ordenar as cartas na mão
-    mao, comps, moves = insertion_sort(mao)
-    comparacoes += comps
-    movimentacoes += moves
+    j = len(mao) - 1
+    while j > 0:
+        comparacoes += 1
+        if mao[j - 1] > mao[j]:
+            mao[j - 1], mao[j] = mao[j], mao[j - 1]
+            movimentacoes += 1
+            j -= 1
+        else:
+            break
 
     return mao, comparacoes, movimentacoes
 
