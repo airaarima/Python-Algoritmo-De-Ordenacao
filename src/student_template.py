@@ -73,11 +73,10 @@ def encontrar_pivos(arr: List[Any], tamanho_vetor: int) -> Tuple[int, int, int, 
             i * (tamanho_vetor - 1) / (quantidade_elementos_amostra - 1)
         )
         indices.append(indice)
-    indices = sorted(set(indices))
+    indices = set(indices)
 
     amostra = [arr[i] for i in indices]
     
-
     amostra_ordenada, comparacoes, movimentacoes = insertion_sort(amostra)
     amostra_ordenada_tamanho = len(amostra_ordenada)
     p1 = amostra_ordenada[amostra_ordenada_tamanho // 3]
