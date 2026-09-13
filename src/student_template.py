@@ -45,6 +45,7 @@ def my_authorial_sort(arr: List[Any]) -> Tuple[List[Any], int, int]:
             moves += m
 
         else:
+            comps += 1
             jogador_meio, c, m = inserir_ordenado(jogador_meio, a[i])
             comps += c
             moves += m
